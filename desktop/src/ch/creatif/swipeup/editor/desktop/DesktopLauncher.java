@@ -16,11 +16,21 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config;
 		config = new LwjglApplicationConfiguration();
 
+		if (Constants.FULLSCREEN) {
+			Constants.setWINDOW_WIDTH(LwjglApplicationConfiguration.getDesktopDisplayMode().width);
+			Constants.setWINDOW_HEIGTH(LwjglApplicationConfiguration.getDesktopDisplayMode().height);
+		}
+
 		config.width = Constants.WINDOW_WIDTH;
 		config.height = Constants.WINDOW_HEIGTH;
 		config.title = Constants.TITLE;
-		config.resizable = false;
+		config.resizable = Constants.RESZIABLE;
 		config.addIcon(Constants.FAVICON, Files.FileType.Internal);
+		
+		if (Constants.BORDERLESSWINDOW) {
+			System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
+		}
+
 		new LwjglApplication(new Main(), config);
 
 	}
