@@ -11,6 +11,7 @@ public class Main extends Game {
 
 	@Override
 	public void render () {
+		super.render();//Delegate the render-methode to the active screen
 	}
 	
 	@Override
