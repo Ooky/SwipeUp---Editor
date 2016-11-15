@@ -43,13 +43,6 @@ public class Editor implements Screen {
 	//Tiles
 	private float tileSide;
 	
-	
-	private Texture texture = new Texture("Tiles/defaultTile.png");
-	
-	private TextureRegion textureRegion = new TextureRegion(texture,0,0,4,4);
-	private Image tiles = new Image(textureRegion);
-	
-
 	public Editor() {
 		//Skin
 		skin.addRegions(buttonAtlas);
@@ -76,12 +69,12 @@ public class Editor implements Screen {
 		
 		tileSide = (((float) Constants.WINDOW_WIDTH) / (100f / 2.375f));
 		
-		tiles.setX(Constants.WINDOW_WIDTH * 0.21f);
-		tiles.setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide);
-		tiles.setWidth(tileSide);
-		tiles.setHeight(tileSide);
+		AssetHelper.tiles.setX(Constants.WINDOW_WIDTH * 0.21f);
+		AssetHelper.tiles.setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide);
+		AssetHelper.tiles.setWidth(tileSide);
+		AssetHelper.tiles.setHeight(tileSide);
 		
-		stage.addActor(tiles);
+		stage.addActor(AssetHelper.tiles);
 	}
 
 	private void generateButtonStyle() {
