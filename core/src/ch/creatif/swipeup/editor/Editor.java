@@ -43,7 +43,7 @@ public class Editor implements Screen {
 	private float tileSectionHeight;
 	private float tileSide;
 	private AssetHelper assetHelper = new AssetHelper();
-	private ArrayList<Image> emptyTileGrid = new ArrayList<Image>();
+	private Image[][] defaultGrid = new Image[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
 
 	public Editor() {
 		//Skin
@@ -85,29 +85,15 @@ public class Editor implements Screen {
 	}
 
 	private void drawDefaultGrid() {
-
-		//WORKIG SHIT
-//			for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
-//			assetHelper.getAllTiles().get(i).setX(Constants.WINDOW_WIDTH * 0.21f);
-//			assetHelper.getAllTiles().get(i).setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide - (i * tileSide));
-//			assetHelper.getAllTiles().get(i).setScale(tileSide / Constants.TILE_SIZE, tileSide / Constants.TILE_SIZE);
-//			emptyTileGrid.add(assetHelper.getAllTiles().get(i));
-//			stage.addActor(emptyTileGrid.get(i));
-//		}
-
-
-		//IN ASSETHELPER: NEED TO Convert allTiles into a 2d array
 		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
 			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
-				assetHelper.getAllTiles().get(i).setX(Constants.WINDOW_WIDTH * 0.21f + (j*tileSide));
-				assetHelper.getAllTiles().get(i).setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide - (i * tileSide));
-				assetHelper.getAllTiles().get(i).setScale(tileSide / Constants.TILE_SIZE, tileSide / Constants.TILE_SIZE);
-				emptyTileGrid.add(assetHelper.getAllTiles().get(i));
-				stage.addActor(emptyTileGrid.get(i));
-				System.out.println(j);
+				defaultGrid[i][j] = assetHelper.getAllTiles()[0][0];//DefaultTiles
+				defaultGrid[i][j].setX(Constants.WINDOW_WIDTH * 0.21f + (j * tileSide));
+				defaultGrid[i][j].setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide - (i * tileSide));
+				defaultGrid[i][j].setScale(tileSide / Constants.TILE_SIZE, tileSide / Constants.TILE_SIZE);
+				stage.addActor(defaultGrid[i][j]);
 			}
 		}
-
 	}
 
 	private void generateButtonStyle() {
