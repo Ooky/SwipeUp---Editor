@@ -6,6 +6,7 @@ public class Main extends Game {
 	
 	@Override
 	public void create () {
+		AssetHelper as = new AssetHelper();
 		setScreen(new Editor());
 	}
 
@@ -18,3 +19,6 @@ public class Main extends Game {
 	public void dispose () {
 	}
 }
+
+//ToDo
+//tiles only rendering correct when maximum

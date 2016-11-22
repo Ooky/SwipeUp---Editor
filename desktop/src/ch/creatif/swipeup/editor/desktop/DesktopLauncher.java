@@ -26,7 +26,7 @@ public class DesktopLauncher {
 		config.title = Constants.TITLE;
 		config.resizable = Constants.RESZIABLE;
 		config.addIcon(Constants.FAVICON, Files.FileType.Internal);
-		
+
 		if (Constants.BORDERLESSWINDOW) {
 			System.setProperty("org.lwjgl.opengl.Window.undecorated", "true");
 		}
