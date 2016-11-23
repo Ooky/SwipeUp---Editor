@@ -3,15 +3,21 @@ package ch.creatif.swipeup.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import java.util.ArrayList;
 
 /**
@@ -69,6 +75,8 @@ public class Editor implements Screen {
 		//MiddleField
 		defineTileSide();
 		drawDefaultGrid();
+		
+//		Gdx.graphics.setWindowedMode(1920, 1080);
 
 		//tableRenderer
 		tableLeft.setDebug(true);
@@ -87,13 +95,18 @@ public class Editor implements Screen {
 	private void drawDefaultGrid() {
 		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
 			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
-				defaultGrid[i][j] = assetHelper.getAllTiles()[0][0];//DefaultTiles
+				defaultGrid[i][j] = new Image(assetHelper.getAllTextureRegions()[0][0]);
 				defaultGrid[i][j].setX(Constants.WINDOW_WIDTH * 0.21f + (j * tileSide));
 				defaultGrid[i][j].setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide - (i * tileSide));
+//				defaultGrid[i][j].setX(400);
+//				defaultGrid[i][j].setY(400);
+
 				defaultGrid[i][j].setScale(tileSide / Constants.TILE_SIZE, tileSide / Constants.TILE_SIZE);
+
 				stage.addActor(defaultGrid[i][j]);
 			}
 		}
+
 	}
 
 	private void generateButtonStyle() {
@@ -112,7 +125,9 @@ public class Editor implements Screen {
 	@Override
 	public void render(float f) {
 		Gdx.gl.glClearColor(42 / 255f, 47 / 255f, 48 / 255f, 1);//0-1, Float.
+//		Gdx.gl.glClearColor(255f / 255f, 255f / 255f, 255f / 255f, 1); //WHITE
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		stage.getCamera().update();
 		stage.act(Gdx.graphics.getDeltaTime());
 
 		stage.draw();
@@ -120,13 +135,16 @@ public class Editor implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		//Sets WindowSize
-		Constants.setWINDOW_WIDTH(Gdx.graphics.getWidth());
-		Constants.setWINDOW_HEIGTH(Gdx.graphics.getHeight());
-		//update stage
-		stage.getViewport().update(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGTH, true);
-		//Updats of Values
-		defineTileSide();
+//		//Sets WindowSize
+//		Constants.setWINDOW_WIDTH(Gdx.graphics.getWidth());
+//		Constants.setWINDOW_HEIGTH(Gdx.graphics.getHeight());
+//		//update stage
+//		stage.getViewport().update(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGTH, true);
+//		//Updats of Values
+//		defineTileSide();
+
+		System.out.println(Gdx.graphics.getWidth());
+		System.out.println(Gdx.graphics.getHeight());
 
 	}
 
