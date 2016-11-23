@@ -4,7 +4,9 @@ import ch.creatif.swipeup.editor.Constants;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import ch.creatif.swipeup.editor.Main;
 import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import org.lwjgl.opengl.Display;
 
 /**
  *
@@ -34,6 +36,5 @@ public class DesktopLauncher {
 		}
 
 		new LwjglApplication(new Main(), config);
-
 	}
 }
