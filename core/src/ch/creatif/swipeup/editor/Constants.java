@@ -9,11 +9,11 @@ public class Constants {
 //==============================================================================
 //Desktoplauncher
 //==============================================================================
-	public static int WINDOW_WIDTH = 1096; // Fix for textureregions
-	public static int WINDOW_HEIGTH = 912;
+	public static int WINDOW_WIDTH = 1920; // Fix for textureregions
+	public static int WINDOW_HEIGTH = 1080;
 	public static final String TITLE = "SwipeUp! - Editor";
 	public static final String FAVICON = "Graphics/Icon/Icon.png";
-	public static final boolean FULLSCREEN = false;
+	public static final boolean FULLSCREEN = true;
 	public static final boolean BORDERLESSWINDOW = false;
 	public static final boolean RESZIABLE = false;
 

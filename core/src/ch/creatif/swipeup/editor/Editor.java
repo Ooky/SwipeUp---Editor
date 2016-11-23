@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -19,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
  */
 public class Editor implements Screen {
 
+	//SpriteBatch
+	SpriteBatch batch = new SpriteBatch();
 	//Stage
 	private Stage stage = new Stage();
 	//Tables
@@ -42,9 +46,8 @@ public class Editor implements Screen {
 	private float tileSectionHeight;
 	private float tileSide;
 	private AssetHelper assetHelper = new AssetHelper();
-	private Image[][] defaultGrid = new Image[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
-	private Image[][] allTiles;
-	private float scaleAvailableTiles = 2f;
+	private TextureRegion[][] defaultGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
+	private TextureRegion[][] allTiles;
 
 	public Editor() {
 		//Tiles
@@ -58,37 +61,45 @@ public class Editor implements Screen {
 		Gdx.input.setInputProcessor(stage);
 		//LeftField
 		generateTablesLeft();
-		drawAvailableTiles();
+//		drawAvailableTiles();
 		//MiddleField
-		drawDefaultGrid();
+//		drawDefaultGrid();
 
 		//tableRenderer
-		tableLeft.setDebug(true);
+//		tableLeft.setDebug(true);
 	}
 
 	private void drawAvailableTiles() {
-		allTiles = new Image[assetHelper.numberOfColumnTiles][assetHelper.numberOfRowTiles];
+		int tileSize = 64;
+		allTiles = new TextureRegion[assetHelper.numberOfColumnTiles][assetHelper.numberOfRowTiles];
+		batch.begin();
 		for (int i = 0; i < assetHelper.numberOfColumnTiles; i++) {
 			for (int j = 0; j < assetHelper.numberOfRowTiles; j++) {
-				allTiles[i][j] = new Image(assetHelper.getAllTextureRegions()[i][j]);
-				allTiles[i][j].setX(Constants.WINDOW_WIDTH * 0.01f + (j * tileSide*scaleAvailableTiles));
-				allTiles[i][j].setY(Constants.WINDOW_HEIGTH * 0.9f - tileSide - (i * tileSide*scaleAvailableTiles));
-				allTiles[i][j].setScale(tileSide / Constants.TILE_SIZE*scaleAvailableTiles, tileSide / Constants.TILE_SIZE*scaleAvailableTiles);
-				stage.addActor(allTiles[i][j]);
+				allTiles[i][j] = assetHelper.getAllTextureRegions()[i][j];
+				batch.draw(allTiles[i][j],
+						Constants.WINDOW_WIDTH * 0.01f + (j * assetHelper.getAllTextureRegions()[0][0].getRegionWidth()),
+						Constants.WINDOW_HEIGTH * 0.88f - tileSide - (i * assetHelper.getAllTextureRegions()[0][0].getRegionHeight()),
+						tileSize,
+						tileSize);
 			}
 		}
+		batch.end();
 	}
 
 	private void drawDefaultGrid() {
+		int tileSize = Gdx.graphics.getHeight() / 27;
+		batch.begin();
 		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
 			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
-				defaultGrid[i][j] = new Image(assetHelper.getAllTextureRegions()[0][0]);
-				defaultGrid[i][j].setX(Constants.WINDOW_WIDTH * 0.21f + (j * tileSide));
-				defaultGrid[i][j].setY(Constants.WINDOW_HEIGTH * 0.99f - tileSide - (i * tileSide));
-				defaultGrid[i][j].setScale(tileSide / Constants.TILE_SIZE, tileSide / Constants.TILE_SIZE);
-				stage.addActor(defaultGrid[i][j]);
+				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][0];
+				batch.draw(defaultGrid[i][j],
+						408 + (j * tileSize),
+						1020 - (i * tileSize),
+						tileSize,
+						tileSize);
 			}
 		}
+		batch.end();
 	}
 
 	private void defineTileSide() {
@@ -136,6 +147,9 @@ public class Editor implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.getCamera().update();
 		stage.act(Gdx.graphics.getDeltaTime());
+
+		drawAvailableTiles();
+		drawDefaultGrid();
 
 		stage.draw();
 	}
