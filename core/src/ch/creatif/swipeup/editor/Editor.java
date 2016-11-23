@@ -43,43 +43,39 @@ public class Editor implements Screen {
 	private float tileSide;
 	private AssetHelper assetHelper = new AssetHelper();
 	private Image[][] defaultGrid = new Image[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
+	private Image[][] allTiles;
+	private float scaleAvailableTiles = 2f;
 
 	public Editor() {
+		//Tiles
+		defineTileSide();
 		//Skin
 		skin.addRegions(buttonAtlas);
-
-		generateButtonStyle();
-
 		//Buttons
-		newFile = new TextButton("Neu", buttonBlueStyle);
-		loadFile = new TextButton("Laden", buttonBlueStyle);
-		saveFile = new TextButton("Speichern unter...", buttonGreenStyle);
+		generateButtonStyle();
+		generateButtons();
 		//Stage
 		Gdx.input.setInputProcessor(stage);
-		//TableLeft
-		tableLeft.setFillParent(true);//size rootTable to stage, only rootTable!
-		tableLeft.left().top();
-		tableLeft.add(newFile).width(0.1f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH);
-		tableLeft.add(loadFile).width(0.1f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH);
-		tableLeft.row();
-		tableLeft.add(saveFile).width(0.2f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH).expandY().bottom().colspan(2).right();
-		stage.addActor(tableLeft);
-
+		//LeftField
+		generateTablesLeft();
+		drawAvailableTiles();
 		//MiddleField
-		defineTileSide();
 		drawDefaultGrid();
 
 		//tableRenderer
 		tableLeft.setDebug(true);
 	}
 
-	private void defineTileSide() {
-		tileSectionWidth = (float) Constants.WINDOW_WIDTH * 0.38f;//Available width
-		tileSectionHeight = (float) Constants.WINDOW_HEIGTH * 0.98f;//Available height
-		if ((tileSectionWidth / Constants.NUMBER_OF_TILES_ROW) > (tileSectionHeight / Constants.NUMBER_OF_TILES_COLUMN)) {
-			tileSide = (tileSectionHeight / Constants.NUMBER_OF_TILES_COLUMN);
-		} else {
-			tileSide = (tileSectionWidth / Constants.NUMBER_OF_TILES_ROW);
+	private void drawAvailableTiles() {
+		allTiles = new Image[assetHelper.numberOfColumnTiles][assetHelper.numberOfRowTiles];
+		for (int i = 0; i < assetHelper.numberOfColumnTiles; i++) {
+			for (int j = 0; j < assetHelper.numberOfRowTiles; j++) {
+				allTiles[i][j] = new Image(assetHelper.getAllTextureRegions()[i][j]);
+				allTiles[i][j].setX(Constants.WINDOW_WIDTH * 0.01f + (j * tileSide*scaleAvailableTiles));
+				allTiles[i][j].setY(Constants.WINDOW_HEIGTH * 0.9f - tileSide - (i * tileSide*scaleAvailableTiles));
+				allTiles[i][j].setScale(tileSide / Constants.TILE_SIZE*scaleAvailableTiles, tileSide / Constants.TILE_SIZE*scaleAvailableTiles);
+				stage.addActor(allTiles[i][j]);
+			}
 		}
 	}
 
@@ -95,6 +91,16 @@ public class Editor implements Screen {
 		}
 	}
 
+	private void defineTileSide() {
+		tileSectionWidth = (float) Constants.WINDOW_WIDTH * 0.38f;//Available width
+		tileSectionHeight = (float) Constants.WINDOW_HEIGTH * 0.98f;//Available height
+		if ((tileSectionWidth / Constants.NUMBER_OF_TILES_ROW) > (tileSectionHeight / Constants.NUMBER_OF_TILES_COLUMN)) {
+			tileSide = (tileSectionHeight / Constants.NUMBER_OF_TILES_COLUMN);
+		} else {
+			tileSide = (tileSectionWidth / Constants.NUMBER_OF_TILES_ROW);
+		}
+	}
+
 	private void generateButtonStyle() {
 		//ButtonStyle Blue
 		buttonBlueStyle = new TextButtonStyle();
@@ -106,6 +112,22 @@ public class Editor implements Screen {
 		buttonGreenStyle.font = font;
 		buttonGreenStyle.up = skin.getDrawable("Green");
 		buttonGreenStyle.down = skin.getDrawable("Grey");
+	}
+
+	private void generateButtons() {
+		newFile = new TextButton("Neu", buttonBlueStyle);
+		loadFile = new TextButton("Laden", buttonBlueStyle);
+		saveFile = new TextButton("Speichern unter...", buttonGreenStyle);
+	}
+
+	private void generateTablesLeft() {
+		tableLeft.setFillParent(true);//size rootTable to stage, only rootTable!
+		tableLeft.left().top();
+		tableLeft.add(newFile).width(0.1f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH);
+		tableLeft.add(loadFile).width(0.1f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH);
+		tableLeft.row();
+		tableLeft.add(saveFile).width(0.2f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH).expandY().bottom().colspan(2).right();
+		stage.addActor(tableLeft);
 	}
 
 	@Override
