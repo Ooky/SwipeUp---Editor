@@ -2,24 +2,27 @@ package ch.creatif.swipeup.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 /**
  *
  * @author Creat-if
  */
-public class Editor implements Screen {
+public final class Editor implements Screen {
 
 	//SpriteBatch
 	SpriteBatch batch = new SpriteBatch();
@@ -48,8 +51,11 @@ public class Editor implements Screen {
 	private AssetHelper assetHelper = new AssetHelper();
 	private TextureRegion[][] defaultGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
 	private TextureRegion[][] allTiles;
+	private TextureRegion[][] actuallGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
 
 	public Editor() {
+		//Stage
+		Gdx.input.setInputProcessor(stage);
 		//Tiles
 		defineTileSide();
 		//Skin
@@ -57,16 +63,54 @@ public class Editor implements Screen {
 		//Buttons
 		generateButtonStyle();
 		generateButtons();
-		//Stage
-		Gdx.input.setInputProcessor(stage);
-		//LeftField
+		//Tables
 		generateTablesLeft();
-//		drawAvailableTiles();
-		//MiddleField
-//		drawDefaultGrid();
 
 		//tableRenderer
 //		tableLeft.setDebug(true);
+	}
+
+	public TextureRegion[][] getActuallGrid() {
+		return actuallGrid;
+	}
+
+	public void setActuallGrid(TextureRegion[][] actuallGrid) {
+		this.actuallGrid = actuallGrid;
+	}
+
+	private void drawActuallGrid() {
+		int tileSize = Gdx.graphics.getHeight() / 27;
+		batch.begin();
+		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
+			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
+				if (actuallGrid[i][j] != null) {
+					batch.draw(actuallGrid[i][j],
+							408 + (j * tileSize),
+							1020 - (i * tileSize),
+							tileSize,
+							tileSize);
+				}
+			}
+		}
+		batch.end();
+	}
+
+	private void drawDefaultGrid() {
+		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
+			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
+				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][0];
+			}
+		}
+		setActuallGrid(defaultGrid);
+	}
+
+	private void drawDefaultGrid2() {
+		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
+			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
+				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][1];
+			}
+		}
+		setActuallGrid(defaultGrid);
 	}
 
 	private void drawAvailableTiles() {
@@ -79,22 +123,6 @@ public class Editor implements Screen {
 				batch.draw(allTiles[i][j],
 						Constants.WINDOW_WIDTH * 0.01f + (j * assetHelper.getAllTextureRegions()[0][0].getRegionWidth()),
 						Constants.WINDOW_HEIGTH * 0.88f - tileSide - (i * assetHelper.getAllTextureRegions()[0][0].getRegionHeight()),
-						tileSize,
-						tileSize);
-			}
-		}
-		batch.end();
-	}
-
-	private void drawDefaultGrid() {
-		int tileSize = Gdx.graphics.getHeight() / 27;
-		batch.begin();
-		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
-			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
-				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][0];
-				batch.draw(defaultGrid[i][j],
-						408 + (j * tileSize),
-						1020 - (i * tileSize),
 						tileSize,
 						tileSize);
 			}
@@ -126,9 +154,30 @@ public class Editor implements Screen {
 	}
 
 	private void generateButtons() {
+
+		//NewFile
 		newFile = new TextButton("Neu", buttonBlueStyle);
+		newFile.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				drawDefaultGrid();
+			}
+		});
+		//LoadFile
 		loadFile = new TextButton("Laden", buttonBlueStyle);
+		loadFile.addListener(new ClickListener() {
+			
+		});
+		//SaveFile
 		saveFile = new TextButton("Speichern unter...", buttonGreenStyle);
+		saveFile.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				FileHandle file = Gdx.files.local("files/myfile.txt");
+				file.writeString("my_first_file", false);
+				System.out.println("You pressed the save button xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+			}
+		});
 	}
 
 	private void generateTablesLeft() {
@@ -149,8 +198,7 @@ public class Editor implements Screen {
 		stage.act(Gdx.graphics.getDeltaTime());
 
 		drawAvailableTiles();
-		drawDefaultGrid();
-
+		drawActuallGrid();
 		stage.draw();
 	}
 
@@ -188,3 +236,14 @@ public class Editor implements Screen {
 	}
 
 }
+//Seperate filehandler with libgdx
+//http://stackoverflow.com/questions/19479877/jfilechooser-in-libgdx
+//http://www.java-gaming.org/index.php?topic=35471.0
+
+//http://stackoverflow.com/questions/3548140/how-to-open-and-save-using-java
+//http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm
+//http://www.java2s.com/Code/Java/Swing-JFC/Asimplefilechoosertoseewhatittakestomakeoneofthesework.htm
+
+
+//MAYBEE
+//https://www.youtube.com/watch?v=SHrVOwt5JWk
