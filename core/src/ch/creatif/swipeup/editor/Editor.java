@@ -11,12 +11,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -52,6 +60,10 @@ public final class Editor implements Screen {
 	private TextureRegion[][] defaultGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
 	private TextureRegion[][] allTiles;
 	private TextureRegion[][] actuallGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
+	//FileHandling
+	private String filePath = "";
+	private String startString = "[";
+	private String endString = "]";
 
 	public Editor() {
 		//Stage
@@ -65,6 +77,8 @@ public final class Editor implements Screen {
 		generateButtons();
 		//Tables
 		generateTablesLeft();
+		//Grid
+		initializeDefaultGrid();
 
 		//tableRenderer
 //		tableLeft.setDebug(true);
@@ -95,21 +109,15 @@ public final class Editor implements Screen {
 		batch.end();
 	}
 
-	private void drawDefaultGrid() {
+	private void initializeDefaultGrid() {
 		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
 			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
 				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][0];
 			}
 		}
-		setActuallGrid(defaultGrid);
 	}
 
-	private void drawDefaultGrid2() {
-		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {
-			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {
-				defaultGrid[i][j] = assetHelper.getAllTextureRegions()[0][1];
-			}
-		}
+	private void drawDefaultGrid() {
 		setActuallGrid(defaultGrid);
 	}
 
@@ -153,6 +161,73 @@ public final class Editor implements Screen {
 		buttonGreenStyle.down = skin.getDrawable("Grey");
 	}
 
+	private TextureRegion[][] loadFile(String filePath) {
+		this.filePath = filePath;
+		FileHandle file = Gdx.files.absolute(this.filePath);
+		String level = file.readString();
+		//remove endlines
+		level = level.replace("\n", "").replace("\r", "");
+
+		TextureRegion[][] loadedGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
+
+		Pattern p = Pattern.compile("\\[(.*?)\\]");
+		Matcher m = p.matcher(level);
+		ArrayList<String> obj = new ArrayList<String>();
+
+		while (m.find()) {
+			obj.add(m.group(1));
+		}
+
+		int gridValues[][] = new int[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
+
+		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {//26
+			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {//16
+				gridValues[i][j] = Integer.valueOf(obj.get(i * Constants.NUMBER_OF_TILES_ROW + j));
+			}
+		}
+		for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {//26
+			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {//16
+				if (gridValues[i][j] < 3) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[0][gridValues[i][j]];//[10][3]
+				} else if (gridValues[i][j] < 6) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[1][gridValues[i][j] - 3];
+				} else if (gridValues[i][j] < 9) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[2][gridValues[i][j] - 6];
+				} else if (gridValues[i][j] < 12) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[3][gridValues[i][j] - 9];
+				} else if (gridValues[i][j] < 15) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[4][gridValues[i][j] - 12];
+				} else if (gridValues[i][j] < 18) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[5][gridValues[i][j] - 15];
+				} else if (gridValues[i][j] < 21) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[6][gridValues[i][j] - 18];
+				} else if (gridValues[i][j] < 24) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[7][gridValues[i][j] - 21];
+				} else if (gridValues[i][j] < 27) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[8][gridValues[i][j] - 24];
+				} else if (gridValues[i][j] < 30) {
+					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[9][gridValues[i][j] - 27];
+				}
+
+//			Doesnt work, gridvalue[i][j] should increase
+//		for (int k = 3; k < 30; k = k + 3) {
+//					if (gridValues[i][j] < 3) {
+//						loadedGrid[i][j] = assetHelper.getAllTextureRegions()[(k / 3) - 1][gridValues[i][j]];//[10][3]
+//					} else if (gridValues[i][j] < k) {
+//						System.out.println("k=" + k);
+//						System.out.println("(k/3)-1=" + ((k / 3) - 1));
+//						System.out.println("-(k-3)=" + (-(k - 3)));
+//						System.out.println("GridValues[i][j]=" + gridValues[i][j]);
+//						System.out.println("");
+//						loadedGrid[i][j] = assetHelper.getAllTextureRegions()[(k / 3) - 1][gridValues[i][j] - (k - 3)];
+//					}
+//				}
+			}
+		}
+
+		return loadedGrid;
+	}
+
 	private void generateButtons() {
 
 		//NewFile
@@ -160,21 +235,59 @@ public final class Editor implements Screen {
 		newFile.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				filePath ="";
 				drawDefaultGrid();
 			}
 		});
 		//LoadFile
 		loadFile = new TextButton("Laden", buttonBlueStyle);
 		loadFile.addListener(new ClickListener() {
-			
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				try {
+					EventQueue.invokeAndWait(new Runnable() {
+						@Override
+						public void run() {
+							JFileChooser chooser = new JFileChooser();
+//							FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt", new String[] {"txt", "png"});
+							FileNameExtensionFilter filter = new FileNameExtensionFilter(".txt", "txt");
+							chooser.setFileFilter(filter);
+							chooser.addChoosableFileFilter(filter);
+							int returnVal = chooser.showOpenDialog(null);
+							if (returnVal == JFileChooser.APPROVE_OPTION) {
+								filePath = chooser.getSelectedFile().getAbsolutePath();
+							}
+							Gdx.app.postRunnable(new Runnable() {
+								@Override
+								public void run() {
+									if (filePath != "") {
+//										System.out.println("File: " + filePath + " loaded!");
+										setActuallGrid(loadFile(filePath));
+									}
+								}
+							});
+						}
+					});
+
+				} catch (InterruptedException ex) {
+					Logger.getLogger(Editor.class
+							.getName()).log(Level.SEVERE, null, ex);
+
+				} catch (InvocationTargetException ex) {
+					Logger.getLogger(Editor.class
+							.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
+
 		});
+
 		//SaveFile
 		saveFile = new TextButton("Speichern unter...", buttonGreenStyle);
 		saveFile.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				FileHandle file = Gdx.files.local("files/myfile.txt");
-				file.writeString("my_first_file", false);
+//				FileHandle file = Gdx.files.local("files/myfile.txt");
+//				file.writeString("my_first_file", false);
 				System.out.println("You pressed the save button xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 			}
 		});
@@ -243,7 +356,29 @@ public final class Editor implements Screen {
 //http://stackoverflow.com/questions/3548140/how-to-open-and-save-using-java
 //http://www.java2s.com/Code/Java/Swing-JFC/DemonstrationofFiledialogboxes.htm
 //http://www.java2s.com/Code/Java/Swing-JFC/Asimplefilechoosertoseewhatittakestomakeoneofthesework.htm
-
-
 //MAYBEE
 //https://www.youtube.com/watch?v=SHrVOwt5JWk
+//
+//for (int i = 0; i < Constants.NUMBER_OF_TILES_COLUMN; i++) {//26
+//			for (int j = 0; j < Constants.NUMBER_OF_TILES_ROW; j++) {//16
+//				if (gridValues[i][j] < 3) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[0][gridValues[i][j]];//[10][3]
+//				} else if (gridValues[i][j] < 6) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[1][gridValues[i][j] - 3];
+//				} else if (gridValues[i][j] < 9) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[2][gridValues[i][j] - 6];
+//				} else if (gridValues[i][j] < 12) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[3][gridValues[i][j] - 9];
+//				} else if (gridValues[i][j] < 15) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[4][gridValues[i][j] - 12];
+//				} else if (gridValues[i][j] < 18) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[5][gridValues[i][j] - 15];
+//				} else if (gridValues[i][j] < 21) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[6][gridValues[i][j] - 18];
+//				} else if (gridValues[i][j] < 24) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[7][gridValues[i][j] - 21];
+//				} else if (gridValues[i][j] < 27) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[8][gridValues[i][j] - 24];
+//				} else if (gridValues[i][j] < 30) {
+//					loadedGrid[i][j] = assetHelper.getAllTextureRegions()[9][gridValues[i][j] - 27];
+//				}
