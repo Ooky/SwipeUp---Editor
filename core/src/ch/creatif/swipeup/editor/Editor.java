@@ -57,6 +57,7 @@ public final class Editor implements Screen {
 	private TextureRegion[][] actuallGrid = new TextureRegion[Constants.NUMBER_OF_TILES_COLUMN][Constants.NUMBER_OF_TILES_ROW];
 	//FileHandling
 	LoadArrayFromFile loadArrayFromFile = new LoadArrayFromFile();
+	SaveArrayToFile saveArrayToFile = new SaveArrayToFile();
 
 	public Editor() {
 		//Stage
@@ -141,21 +142,7 @@ public final class Editor implements Screen {
 		}
 	}
 
-	private void generateButtonStyle() {
-		//ButtonStyle Blue
-		buttonBlueStyle = new TextButtonStyle();
-		buttonBlueStyle.font = font;
-		buttonBlueStyle.up = skin.getDrawable("Blue");
-		buttonBlueStyle.down = skin.getDrawable("Grey");
-		//ButtonStyle Green
-		buttonGreenStyle = new TextButtonStyle();
-		buttonGreenStyle.font = font;
-		buttonGreenStyle.up = skin.getDrawable("Green");
-		buttonGreenStyle.down = skin.getDrawable("Grey");
-	}
-
 	private void generateButtons() {
-
 		//NewFile
 		newFile = new TextButton("Neu", buttonBlueStyle);
 		newFile.addListener(new ClickListener() {
@@ -201,9 +188,29 @@ public final class Editor implements Screen {
 		saveFile.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-//				FileHandle file = Gdx.files.local("files/myfile.txt");
-//				file.writeString("my_first_file", false);
-				System.out.println("You pressed the save button xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+				try {
+					EventQueue.invokeAndWait(new Runnable() {
+						@Override
+						public void run() {
+							saveArrayToFile.initFile();
+
+							Gdx.app.postRunnable(new Runnable() {
+								@Override
+								public void run() {
+									saveArrayToFile.saveFile(getActuallGrid());
+								}
+							});
+						}
+					});
+
+				} catch (InterruptedException ex) {
+					Logger.getLogger(Editor.class
+							.getName()).log(Level.SEVERE, null, ex);
+
+				} catch (InvocationTargetException ex) {
+					Logger.getLogger(Editor.class
+							.getName()).log(Level.SEVERE, null, ex);
+				}
 			}
 		});
 	}
@@ -216,6 +223,19 @@ public final class Editor implements Screen {
 		tableLeft.row();
 		tableLeft.add(saveFile).width(0.2f * Constants.WINDOW_WIDTH).height(0.04f * Constants.WINDOW_WIDTH).expandY().bottom().colspan(2).right();
 		stage.addActor(tableLeft);
+	}
+
+	private void generateButtonStyle() {
+		//ButtonStyle Blue
+		buttonBlueStyle = new TextButtonStyle();
+		buttonBlueStyle.font = font;
+		buttonBlueStyle.up = skin.getDrawable("Blue");
+		buttonBlueStyle.down = skin.getDrawable("Grey");
+		//ButtonStyle Green
+		buttonGreenStyle = new TextButtonStyle();
+		buttonGreenStyle.font = font;
+		buttonGreenStyle.up = skin.getDrawable("Green");
+		buttonGreenStyle.down = skin.getDrawable("Grey");
 	}
 
 	@Override
